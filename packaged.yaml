@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'apidemo
+
+  '
+Globals:
+  Function:
+    Timeout: 10
+Outputs:
+  GetFixIp:
+    Description: Get a fixed IP for demo
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  GetInternetIp:
+    Description: Get Lambda's internet IP
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/{proxy+}
+Resources:
+  GetIpFunction:
+    Properties:
+      AutoPublishAlias: live
+      CodeUri: s3://hzchen-private-ore/fc8b2e2f13bf380a9fc37e70d3d7229e
+      DeploymentPreference:
+        Type: Linear10PercentEvery1Minute
+      Environment:
+        Variables:
+          PARAM1: VALUE
+      Events:
+        GetFixIp:
+          Properties:
+            Method: ANY
+            Path: /
+          Type: Api
+        GetInternetIp:
+          Properties:
+            Method: ANY
+            Path: /{proxy+}
+          Type: Api
+      FunctionName: api_demo
+      Handler: app.lambda_handler
+      Runtime: python2.7
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31

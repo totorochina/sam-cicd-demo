@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    apidemo
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+
+# Parameters are CloudFormation features to pass input
+# to your template when you create a stack
+#Parameters:
+#    AliasErrorMetricGreaterThanZeroAlarm:
+#        Type: String
+#    LatestVersionErrorMetricGreaterThanZeroAlarm:
+#        Type: String
+
+
+Globals:
+    Function:
+        Timeout: 10
+
+
+Resources:
+
+    GetIpFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: apidemo/build/
+            Handler: app.lambda_handler
+            Runtime: python2.7
+            FunctionName: api_demo
+            Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+                Variables:
+                    PARAM1: VALUE
+            Events:
+                GetFixIp:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        Path: /
+                        Method: ANY
+                GetInternetIp:
+                    Type: Api
+                    Properties:
+                        Path: /{proxy+}
+                        Method: ANY
+            
+            AutoPublishAlias: live
+            DeploymentPreference:
+            # https://docs.aws.amazon.com/lambda/latest/dg/automating-updates-to-serverless-apps.html
+            # Type: Canary10Percent5Minutes
+            # Type: Canary10Percent10Minutes
+            # Type: Canary10Percent15Minutes
+            # Type: Canary10Percent30Minutes
+            # Type: Linear10PercentEvery1Minute
+            # Type: Linear10PercentEvery2Minute
+            # Type: Linear10PercentEvery3Minute
+            # Type: Linear10PercentEvery10Minute
+                Type:  Linear10PercentEvery1Minute
+            #Alarms:
+            # A list of alarms that you want to monitor
+             #   - !Ref AliasErrorMetricGreaterThanZeroAlarm
+             #   - !Ref LatestVersionErrorMetricGreaterThanZeroAlarm
+            #Hooks:
+            # Validation Lambda functions that are run before & after traffic shifting
+              #  PreTraffic: !Ref PreTrafficLambdaFunction
+                #PostTraffic: !Ref PostTrafficLambdaFunction
+
+Outputs:
+
+    GetFixIp:
+      Description: "Get a fixed IP for demo"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
+    GetInternetIp:
+      Description: "Get Lambda's internet IP"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/{proxy+}"
