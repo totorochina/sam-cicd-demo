@@ -4,6 +4,9 @@ REPLACE_THIS_WITH_YOUR_S3_BUCKET_NAME="hzchen-private-ore"
 REGION="us-west-2"
 STACK="sam-apidemo"
 
+pip install -r requirements.txt -t apidemo/build/ && \
+cp apidemo/*.py apidemo/build/ && \
+
 sam validate && \
 sam package \
 	    --template-file template.yaml \

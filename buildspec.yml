@@ -10,16 +10,19 @@ phases:
     commands:
       - echo Run unit test...
       - echo to be updated...
-      - echo Validate template.yaml...
-      - sam validate
 
   build:
     commands:
       - echo Install requirements for app...
-      - pip install -r requirements.txt -t apidemo/build/
-      - cp apidemo/*.py apidemo/build/
+      - pip install -r requirements.txt -t $APP/build/
+      - cp $APP/*.py $APP/build/
+      - echo Validate template.yaml...
+      - sam validate
       - echo Gen packaged.yaml...
-      - bash build.sh
+      - sam package --template-file template.yaml
+        --output-template-file packaged.yaml
+        --s3-bucket $S3_BUCKET
+        --region $REGION
 
   post_build:
     commands:
