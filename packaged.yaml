@@ -18,7 +18,7 @@ Resources:
   GetIpFunction:
     Properties:
       AutoPublishAlias: live
-      CodeUri: s3://hzchen-private-ore/4277452892518d295cb27d9805b1e34b
+      CodeUri: s3://hzchen-private-ore/f4808f0c9ea11af90b6584be92d2ffc7
       DeploymentPreference:
         Type: AllAtOnce
       Environment:
