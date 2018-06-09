@@ -17,7 +17,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 200,
             "body": json.dumps({
-                'message': '1.1.1.1',
+                'message': '1.1.1.3',
             })
         }
     else:
