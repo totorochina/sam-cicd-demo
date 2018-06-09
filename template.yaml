@@ -54,7 +54,8 @@ Resources:
             # Type: Linear10PercentEvery2Minute
             # Type: Linear10PercentEvery3Minute
             # Type: Linear10PercentEvery10Minute
-                Type:  Linear10PercentEvery1Minute
+            # Type: AllAtOnce
+                Type:  AllAtOnce
             #Alarms:
             # A list of alarms that you want to monitor
              #   - !Ref AliasErrorMetricGreaterThanZeroAlarm
