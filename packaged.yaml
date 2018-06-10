@@ -15,12 +15,56 @@ Outputs:
     Value:
       Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/{proxy+}
 Resources:
+  APIG4XXErrorAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmDescription: APIG too many 4xx errors
+      AlarmName: sam-apidemo too many 4xx errors
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: ApiName
+        Value:
+          Fn::Sub: ${AWS::StackName}
+      - Name: Stage
+        Value: Prod
+      EvaluationPeriods: '1'
+      MetricName: 4XXError
+      Namespace: AWS/ApiGateway
+      Period: '60'
+      Statistic: Sum
+      Threshold: '1'
+      TreatMissingData: notBreaching
+      Unit: Count
+    Type: AWS::CloudWatch::Alarm
+  APIG5XXErrorAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmDescription: APIG too many 5xx errors
+      AlarmName: sam-apidemo too many 5xx errors
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: ApiName
+        Value:
+          Fn::Sub: ${AWS::StackName}
+      - Name: Stage
+        Value: Prod
+      EvaluationPeriods: '1'
+      MetricName: 5XXError
+      Namespace: AWS/ApiGateway
+      Period: '60'
+      Statistic: Sum
+      Threshold: '1'
+      TreatMissingData: notBreaching
+      Unit: Count
+    Type: AWS::CloudWatch::Alarm
   GetIpFunction:
     Properties:
       AutoPublishAlias: live
-      CodeUri: s3://hzchen-private-ore/a26111f14716aa21001c85c122d1ef7d
+      CodeUri: s3://hzchen-private-ore/881d822d7b12a831a87e94551af1cedb
       DeploymentPreference:
-        Type: AllAtOnce
+        Alarms:
+        - Ref: APIG4XXErrorAlarm
+        Type: Linear10PercentEvery1Minute
       Environment:
         Variables:
           PARAM1: VALUE
@@ -38,5 +82,6 @@ Resources:
       FunctionName: api_demo
       Handler: app.lambda_handler
       Runtime: python2.7
+      Tracing: Active
     Type: AWS::Serverless::Function
 Transform: AWS::Serverless-2016-10-31

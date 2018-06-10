@@ -9,7 +9,7 @@ phases:
   pre_build:
     commands:
       - echo Run unit test...
-      - echo to be updated...
+      - echo python -m pytest -v ./tests
 
   build:
     commands:

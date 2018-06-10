@@ -1,6 +1,6 @@
-import json
+import json, re
 import pytest
-from hello_world import app
+from apidemo import app
 
 
 @pytest.fixture()
@@ -89,8 +89,9 @@ def test_lambda_handler(apigw_event):
     ret = app.lambda_handler(apigw_event, "")
     assert ret['statusCode'] == 200
 
-    for key in ('message', 'location'):
+    for key in ('message'):
         assert key in ret['body']
 
     data = json.loads(ret['body'])
-    assert data['message'] == 'hello world'
+    #assert data['message'] == 'hello world'
+    assert re.match('\d+\.\d+\.\d+\.\d+', data['message'])

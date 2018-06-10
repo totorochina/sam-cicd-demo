@@ -27,6 +27,7 @@ Resources:
             CodeUri: apidemo/build/
             Handler: app.lambda_handler
             Runtime: python2.7
+            Tracing: Active  # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
             FunctionName: api_demo
             Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
                 Variables:
@@ -56,14 +57,78 @@ Resources:
             # Type: Linear10PercentEvery10Minute
             # Type: AllAtOnce
                 Type:  AllAtOnce
-            #Alarms:
-            # A list of alarms that you want to monitor
-             #   - !Ref AliasErrorMetricGreaterThanZeroAlarm
-             #   - !Ref LatestVersionErrorMetricGreaterThanZeroAlarm
-            #Hooks:
-            # Validation Lambda functions that are run before & after traffic shifting
-              #  PreTraffic: !Ref PreTrafficLambdaFunction
-                #PostTraffic: !Ref PostTrafficLambdaFunction
+                Alarms:
+                # A list of alarms that you want to monitor
+                #   - !Ref AliasErrorMetricGreaterThanZeroAlarm
+                #   - !Ref LatestVersionErrorMetricGreaterThanZeroAlarm
+                    - !Ref APIG4XXErrorAlarm
+                #Hooks:
+                # Validation Lambda functions that are run before & after traffic shifting
+                #  PreTraffic: !Ref PreTrafficLambdaFunction
+                #  PostTraffic: !Ref PostTrafficLambdaFunction
+    APIG4XXErrorAlarm:
+        Type: "AWS::CloudWatch::Alarm"
+        Properties:
+            ActionsEnabled: true
+            #AlarmActions:
+            #    - String
+            AlarmDescription: "APIG too many 4xx errors"
+            AlarmName: "sam-apidemo too many 4xx errors"
+            ComparisonOperator: GreaterThanThreshold
+            Dimensions:
+                - 
+                    Name: 'ApiName'
+                    Value: 
+                        'Fn::Sub': '${AWS::StackName}'
+                -
+                    Name: 'Stage'
+                    Value: 'Prod'
+            #EvaluateLowSampleCountPercentile: String
+            EvaluationPeriods: "1"
+            #ExtendedStatistic: String
+            #InsufficientDataActions:
+            #    - String
+            MetricName: 4XXError
+            Namespace: AWS/ApiGateway
+            #OKActions:
+            #    - String
+            Period: "60"
+            Statistic: "Sum"
+            Threshold: "1"
+            TreatMissingData: "notBreaching"
+            Unit: "Count"
+
+    APIG5XXErrorAlarm:
+        Type: "AWS::CloudWatch::Alarm"
+        Properties:
+            ActionsEnabled: true
+            #AlarmActions:
+            #    - String
+            AlarmDescription: "APIG too many 5xx errors"
+            AlarmName: "sam-apidemo too many 5xx errors"
+            ComparisonOperator: GreaterThanThreshold
+            Dimensions:
+                - 
+                    Name: 'ApiName'
+                    Value: 
+                        'Fn::Sub': '${AWS::StackName}'
+                -
+                    Name: 'Stage'
+                    Value: 'Prod'
+            #EvaluateLowSampleCountPercentile: String
+            EvaluationPeriods: "1"
+            #ExtendedStatistic: String
+            #InsufficientDataActions:
+            #    - String
+            MetricName: 5XXError
+            Namespace: AWS/ApiGateway
+            #OKActions:
+            #    - String
+            Period: "60"
+            Statistic: "Sum"
+            Threshold: "1"
+            TreatMissingData: "notBreaching"
+            Unit: "Count"
 
 Outputs:
 
