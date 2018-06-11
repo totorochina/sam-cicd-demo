@@ -1,9 +1,5 @@
 import json
-from aws_xray_sdk.core import xray_recorder
-from aws_xray_sdk.core import patch
-
 import requests
-patch('requests')
 
 def lambda_handler(event, context):
     """Sample pure Lambda function
@@ -20,7 +16,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 200,
             "body": json.dumps({
-                'message': '1.1.1.1',
+                'message': '1.1.1.2',
             })
         }
     else:

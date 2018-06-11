@@ -60,11 +60,12 @@ Resources:
   GetIpFunction:
     Properties:
       AutoPublishAlias: live
-      CodeUri: s3://hzchen-private-ore/3a48709b27e54cc32fd01a1f733c2519
+      CodeUri: s3://hzchen-private-ore/5349614bc24dcdeda9153112bd53e27a
       DeploymentPreference:
         Alarms:
         - Ref: APIG4XXErrorAlarm
-        Type: Linear10PercentEvery1Minute
+        - Ref: APIG5XXErrorAlarm
+        Type: AllAtOnce
       Environment:
         Variables:
           PARAM1: VALUE
