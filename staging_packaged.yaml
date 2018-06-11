@@ -14,35 +14,12 @@ Outputs:
     Description: Get Lambda's internet IP
     Value:
       Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/{proxy+}
-Parameters:
-  DeploymentPreference:
-    AllowedValues:
-    - Canary10Percent5Minutes
-    - Canary10Percent10Minutes
-    - Canary10Percent15Minutes
-    - Canary10Percent30Minutes
-    - Linear10PercentEvery1Minute
-    - Linear10PercentEvery2Minute
-    - Linear10PercentEvery3Minute
-    - Linear10PercentEvery10Minute
-    - AllAtOnce
-    Default: AllAtOnce
-    Description: https://docs.aws.amazon.com/lambda/latest/dg/automating-updates-to-serverless-apps.html
-    Type: String
-  Env:
-    AllowedValues:
-    - prod
-    - staging
-    Default: prod
-    Description: Define prod/staging by Parameters
-    Type: String
 Resources:
   APIG4XXErrorAlarm:
     Properties:
       ActionsEnabled: true
       AlarmDescription: APIG too many 4xx errors
-      AlarmName:
-        Fn::Sub: sam-apidemo-${Env} too many 4xx errors
+      AlarmName: sam-apidemo-staging too many 4xx errors
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
       - Name: ApiName
@@ -63,8 +40,7 @@ Resources:
     Properties:
       ActionsEnabled: true
       AlarmDescription: APIG too many 5xx errors
-      AlarmName:
-        Fn::Sub: sam-apidemo-${Env} too many 5xx errors
+      AlarmName: sam-apidemo-staging too many 5xx errors
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
       - Name: ApiName
@@ -84,13 +60,12 @@ Resources:
   GetIpFunction:
     Properties:
       AutoPublishAlias: live
-      CodeUri: s3://hzchen-private-ore/1bf78b621c96bbff790f6ff7f889a7b7
+      CodeUri: s3://hzchen-private-ore/d54279914776f346309d9d396ddd6482
       DeploymentPreference:
         Alarms:
         - Ref: APIG4XXErrorAlarm
         - Ref: APIG5XXErrorAlarm
-        Type:
-          Fn::Sub: ${DeploymentPreference}
+        Type: AllAtOnce
       Environment:
         Variables:
           PARAM1: VALUE
@@ -105,8 +80,7 @@ Resources:
             Method: ANY
             Path: /{proxy+}
           Type: Api
-      FunctionName:
-        Fn::Sub: api_demo_${Env}
+      FunctionName: api_demo_staging
       Handler: app.lambda_handler
       Runtime: python2.7
       Tracing: Active

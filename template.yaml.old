@@ -7,29 +7,11 @@ Description: >
 
 # Parameters are CloudFormation features to pass input
 # to your template when you create a stack
-Parameters: 
-    Env: 
-        Type: String
-        Default: prod
-        AllowedValues: 
-            - prod
-            - staging
-        Description: Define prod/staging by Parameters
-
-    DeploymentPreference:
-        Type: String
-        Default: AllAtOnce
-        AllowedValues:
-            - Canary10Percent5Minutes
-            - Canary10Percent10Minutes
-            - Canary10Percent15Minutes
-            - Canary10Percent30Minutes
-            - Linear10PercentEvery1Minute
-            - Linear10PercentEvery2Minute
-            - Linear10PercentEvery3Minute
-            - Linear10PercentEvery10Minute
-            - AllAtOnce
-        Description: https://docs.aws.amazon.com/lambda/latest/dg/automating-updates-to-serverless-apps.html
+#Parameters:
+#    AliasErrorMetricGreaterThanZeroAlarm:
+#        Type: String
+#    LatestVersionErrorMetricGreaterThanZeroAlarm:
+#        Type: String
 
 
 Globals:
@@ -46,8 +28,7 @@ Resources:
             Handler: app.lambda_handler
             Runtime: python2.7
             Tracing: Active  # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
-            FunctionName:
-                'Fn::Sub': 'api_demo_${Env}'
+            FunctionName: api_demo
             Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
                 Variables:
                     PARAM1: VALUE
@@ -65,10 +46,18 @@ Resources:
             
             AutoPublishAlias: live
             DeploymentPreference:
-                #Type:  Linear10PercentEvery1Minute
-                #Type:  AllAtOnce
-                Type:
-                    'Fn::Sub': '${DeploymentPreference}'
+            # https://docs.aws.amazon.com/lambda/latest/dg/automating-updates-to-serverless-apps.html
+            # Type: Canary10Percent5Minutes
+            # Type: Canary10Percent10Minutes
+            # Type: Canary10Percent15Minutes
+            # Type: Canary10Percent30Minutes
+            # Type: Linear10PercentEvery1Minute
+            # Type: Linear10PercentEvery2Minute
+            # Type: Linear10PercentEvery3Minute
+            # Type: Linear10PercentEvery10Minute
+            # Type: AllAtOnce
+            #Type:  Linear10PercentEvery1Minute
+                Type:  AllAtOnce
                 Alarms:
                 # A list of alarms that you want to monitor
                 #   - !Ref AliasErrorMetricGreaterThanZeroAlarm
@@ -86,8 +75,7 @@ Resources:
             #AlarmActions:
             #    - String
             AlarmDescription: "APIG too many 4xx errors"
-            AlarmName:
-                'Fn::Sub': 'sam-apidemo-${Env} too many 4xx errors'
+            AlarmName: "sam-apidemo too many 4xx errors"
             ComparisonOperator: GreaterThanThreshold
             Dimensions:
                 - 
@@ -119,8 +107,7 @@ Resources:
             #AlarmActions:
             #    - String
             AlarmDescription: "APIG too many 5xx errors"
-            AlarmName:
-                'Fn::Sub': 'sam-apidemo-${Env} too many 5xx errors'
+            AlarmName: "sam-apidemo too many 5xx errors"
             ComparisonOperator: GreaterThanThreshold
             Dimensions:
                 - 
