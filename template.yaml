@@ -56,12 +56,14 @@ Resources:
             # Type: Linear10PercentEvery3Minute
             # Type: Linear10PercentEvery10Minute
             # Type: AllAtOnce
-                Type:  Linear10PercentEvery1Minute
+            #Type:  Linear10PercentEvery1Minute
+                Type:  AllAtOnce
                 Alarms:
                 # A list of alarms that you want to monitor
                 #   - !Ref AliasErrorMetricGreaterThanZeroAlarm
                 #   - !Ref LatestVersionErrorMetricGreaterThanZeroAlarm
                     - !Ref APIG4XXErrorAlarm
+                    - !Ref APIG5XXErrorAlarm
                 #Hooks:
                 # Validation Lambda functions that are run before & after traffic shifting
                 #  PreTraffic: !Ref PreTrafficLambdaFunction

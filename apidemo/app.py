@@ -1,6 +1,9 @@
 import json
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch
 
 import requests
+patch('requests')
 
 def lambda_handler(event, context):
     """Sample pure Lambda function
