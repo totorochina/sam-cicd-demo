@@ -84,7 +84,7 @@ Resources:
   GetIpFunction:
     Properties:
       AutoPublishAlias: live
-      CodeUri: s3://hzchen-private-ore/dc5b102d3717a4cbdf50716e45ed2b60
+      CodeUri: s3://hzchen-private-ore/c759a8fa66907b19cc87d749c629e802
       DeploymentPreference:
         Alarms:
         - Ref: APIG4XXErrorAlarm
