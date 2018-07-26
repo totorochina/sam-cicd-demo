@@ -1,0 +1,159 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    apidemo
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+
+# Parameters are CloudFormation features to pass input
+# to your template when you create a stack
+Parameters: 
+    Env: 
+        Type: String
+        Default: prod
+        AllowedValues: 
+            - prod
+            - staging
+        Description: Define prod/staging by Parameters
+
+    DeploymentPreference:
+        Type: String
+        Default: AllAtOnce
+        AllowedValues:
+            - Canary10Percent5Minutes
+            - Canary10Percent10Minutes
+            - Canary10Percent15Minutes
+            - Canary10Percent30Minutes
+            - Linear10PercentEvery1Minute
+            - Linear10PercentEvery2Minute
+            - Linear10PercentEvery3Minute
+            - Linear10PercentEvery10Minute
+            - AllAtOnce
+        Description: https://docs.aws.amazon.com/lambda/latest/dg/automating-updates-to-serverless-apps.html
+
+
+Globals:
+    Function:
+        Timeout: 10
+
+
+Resources:
+
+    GetIpFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: apidemo/build/
+            Handler: app.lambda_handler
+            Runtime: python2.7
+            # Not supported in China region
+            #Tracing: Active  # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
+            FunctionName:
+                'Fn::Sub': 'api_demo_${Env}'
+            # Not supported in China region
+            #Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+            #    Variables:
+            #        PARAM1: VALUE
+            Events:
+                GetFixIp:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        Path: /
+                        Method: ANY
+                GetInternetIp:
+                    Type: Api
+                    Properties:
+                        Path: /{proxy+}
+                        Method: ANY
+            
+            # Not supported in China region (Safe Deployment)
+            #AutoPublishAlias: live
+            #DeploymentPreference:
+                #Type:  Linear10PercentEvery1Minute
+                #Type:  AllAtOnce
+                #Type:
+                #'Fn::Sub': '${DeploymentPreference}'
+                #Alarms:
+                # A list of alarms that you want to monitor
+                #   - !Ref AliasErrorMetricGreaterThanZeroAlarm
+                #   - !Ref LatestVersionErrorMetricGreaterThanZeroAlarm
+                #    - !Ref APIG4XXErrorAlarm
+                #    - !Ref APIG5XXErrorAlarm
+                #Hooks:
+                # Validation Lambda functions that are run before & after traffic shifting
+                #  PreTraffic: !Ref PreTrafficLambdaFunction
+                #  PostTraffic: !Ref PostTrafficLambdaFunction
+    APIG4XXErrorAlarm:
+        Type: "AWS::CloudWatch::Alarm"
+        Properties:
+            ActionsEnabled: true
+            #AlarmActions:
+            #    - String
+            AlarmDescription: "APIG too many 4xx errors"
+            AlarmName:
+                'Fn::Sub': 'sam-apidemo-${Env} too many 4xx errors'
+            ComparisonOperator: GreaterThanThreshold
+            Dimensions:
+                - 
+                    Name: 'ApiName'
+                    Value: 
+                        'Fn::Sub': '${AWS::StackName}'
+                -
+                    Name: 'Stage'
+                    Value: 'Prod'
+            #EvaluateLowSampleCountPercentile: String
+            EvaluationPeriods: "1"
+            #ExtendedStatistic: String
+            #InsufficientDataActions:
+            #    - String
+            MetricName: 4XXError
+            Namespace: AWS/ApiGateway
+            #OKActions:
+            #    - String
+            Period: "60"
+            Statistic: "Sum"
+            Threshold: "1"
+            TreatMissingData: "notBreaching"
+            Unit: "Count"
+
+    APIG5XXErrorAlarm:
+        Type: "AWS::CloudWatch::Alarm"
+        Properties:
+            ActionsEnabled: true
+            #AlarmActions:
+            #    - String
+            AlarmDescription: "APIG too many 5xx errors"
+            AlarmName:
+                'Fn::Sub': 'sam-apidemo-${Env} too many 5xx errors'
+            ComparisonOperator: GreaterThanThreshold
+            Dimensions:
+                - 
+                    Name: 'ApiName'
+                    Value: 
+                        'Fn::Sub': '${AWS::StackName}'
+                -
+                    Name: 'Stage'
+                    Value: 'Prod'
+            #EvaluateLowSampleCountPercentile: String
+            EvaluationPeriods: "1"
+            #ExtendedStatistic: String
+            #InsufficientDataActions:
+            #    - String
+            MetricName: 5XXError
+            Namespace: AWS/ApiGateway
+            #OKActions:
+            #    - String
+            Period: "60"
+            Statistic: "Sum"
+            Threshold: "1"
+            TreatMissingData: "notBreaching"
+            Unit: "Count"
+
+Outputs:
+
+    GetFixIp:
+      Description: "Get a fixed IP for demo"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com.cn/Prod/"
+
+    GetInternetIp:
+      Description: "Get Lambda's internet IP"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com.cn/Prod/{proxy+}"

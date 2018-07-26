@@ -83,17 +83,7 @@ Resources:
     Type: AWS::CloudWatch::Alarm
   GetIpFunction:
     Properties:
-      AutoPublishAlias: live
-      CodeUri: s3://hzchen-private-ore/21bffc3b0a13fb953f9c15a1f6de96e6
-      DeploymentPreference:
-        Alarms:
-        - Ref: APIG4XXErrorAlarm
-        - Ref: APIG5XXErrorAlarm
-        Type:
-          Fn::Sub: ${DeploymentPreference}
-      Environment:
-        Variables:
-          PARAM1: VALUE
+      CodeUri: s3://hzchen-private/990cd0232251cdad6e3fc97bc18c5422
       Events:
         GetFixIp:
           Properties:
@@ -109,6 +99,5 @@ Resources:
         Fn::Sub: api_demo_${Env}
       Handler: app.lambda_handler
       Runtime: python2.7
-      Tracing: Active
     Type: AWS::Serverless::Function
 Transform: AWS::Serverless-2016-10-31
